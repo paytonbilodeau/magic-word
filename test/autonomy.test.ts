@@ -544,7 +544,7 @@ describe("voice notes and images", () => {
         const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
         if (url === VOICE) return new Response(new Uint8Array([1, 2, 3]), { headers: { "Content-Type": "audio/mp4" } });
         if (url === IMAGE) return new Response(new Uint8Array([4, 5, 6]), { headers: { "Content-Type": "image/png" } });
-        if (url.includes("api.anthropic.com")) {
+        if (new URL(url).origin === "https://api.anthropic.com") {
           const body = input instanceof Request ? await input.text() : String(init?.body);
           apiBodies.push(JSON.parse(body));
           return Response.json({
