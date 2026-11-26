@@ -9,7 +9,7 @@
     "preview": "node scripts/host.mjs",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "test": "vitest run && node --test mcp/acceptance.mjs",
+    "test": "vitest run && node --test mcp/acceptance.mjs mcp/onboarding.mjs",
     "typecheck": "tsc --noEmit",
     "predeploy": "node scripts/setup.mjs preflight",
     "postinstall": "node scripts/setup.mjs prepare",
@@ -17,13 +17,15 @@
     "mcp": "node mcp/stdio.mjs",
     "mcp:http": "node mcp/http.mjs",
     "bundle:worker": "wrangler deploy --dry-run --outdir .magic-word/worker-build",
-    "example": "node examples/comment-to-dm.mjs"
+    "example": "node examples/comment-to-dm.mjs",
+    "setup:ai": "node scripts/setup-ai.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",
     "@modelcontextprotocol/sdk": "1.32.2",
     "esbuild": "0.28.2",
     "jose": "6.2.18",
+    "jsonc-parser": "3.3.1",
     "linkedom": "0.18.15",
     "zod": "^4.6.7"
   },
@@ -37,7 +39,7 @@
   "engines": {
     "node": ">=24.0.0"
   },
-  "description": "A self-hosted ManyChat alternative for Instagram comment-to-DM automation and MCP inbox control.",
+  "description": "A ManyChat alternative for Instagram comment-to-DM automation and MCP inbox control.",
   "license": "MIT",
   "repository": {
     "type": "git",

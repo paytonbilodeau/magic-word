@@ -2,7 +2,9 @@
 
 ## Codex, Claude Code and other local clients
 
-Install project dependencies first. Replace the example script path with the absolute path to your checkout.
+For automatic setup, run `npm ci` and `npm run setup:ai`. It verifies the offline example and registers installed Claude Code and Codex clients. To select one client, append `-- --client codex`, `claude`, `cursor` or `gemini` using the same flag. Cursor and Gemini preserve other entries in their user settings.
+
+For manual setup, install project dependencies first. Replace the example script path with the absolute path to your checkout.
 
 ```sh
 codex mcp add magic-word -- node /absolute/path/to/magic-word/mcp/stdio.mjs

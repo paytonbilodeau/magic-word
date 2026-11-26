@@ -1,5 +1,7 @@
 # SETUP.md: from this folder to a live Magic Word
 
+This guide provisions the Cloudflare version. If someone gave you the repository link and asked for AI setup, start with [the local agent setup](AGENTS.md).
+
 **If you're a person:** you don't need this page. Run `npm run setup` and follow it. The README has the short version.
 
 **If you're Claude (or another coding agent):** the user said "set this up". This page is your runbook. Assume they have never used a terminal: explain each step in a sentence of plain words before you do it, do everything you can yourself, and only hand them what needs their hands (signing in, clicking in Meta's dashboard, pasting a secret into `.env`). One thing at a time. Tick steps off in chat as they land.

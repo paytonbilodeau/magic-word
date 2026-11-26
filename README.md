@@ -1,8 +1,16 @@
 # Magic Word
 
-Magic Word is a self-hosted **ManyChat alternative** for Instagram auto-DMs. Someone comments **GUIDE** on your Instagram reel. Magic Word sends the private reply you wrote, records the result, and shows the conversation in your inbox. You can set it up in a browser or ask an MCP client to build the automation.
+Magic Word is a **ManyChat alternative** for Instagram auto-DMs. Someone comments **GUIDE** on your Instagram reel. Magic Word sends the private reply you wrote, records the result, and shows the conversation in your inbox. You can set it up in a browser or ask an MCP client to build the automation.
 
 The Instagram engine and visual editor come from [FewChat by Jason Cooperson](https://github.com/jasonc00person/fewchat). Magic Word adds a local SQLite host, MCP control and three more messaging channels.
+
+## Set this up for my AI
+
+Give your coding assistant this prompt:
+
+> Set this up for my AI: https://github.com/paytonbilodeau/magic-word
+
+Claude Code, Codex and other assistants with terminal access can follow the [agent setup instructions](AGENTS.md). The installer connects the tools and runs a sample comment through the automation. You can try everything in the example before choosing a host or signing in to Instagram.
 
 ## Try it locally
 

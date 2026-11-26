@@ -24,7 +24,7 @@ jobs:
       - run: npm ci --no-fund
       - run: npm run typecheck
       - run: npm test
-      - run: npm run example
+      - run: npm run setup:ai -- --client json
       - run: npm run bundle:worker
   quality:
     name: Repository quality
