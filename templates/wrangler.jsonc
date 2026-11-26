@@ -1,0 +1,40 @@
+{
+  "name": "magic-word",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    // Your database: `npm run setup` creates it and fills in the id.
+    { "binding": "DB", "database_name": "magic-word", "database_id": "REPLACE_D1_DATABASE_ID" }
+  ],
+  // Workers AI: Deepgram/Whisper transcribe voice notes (src/media.ts).
+  "ai": { "binding": "AI" },
+  // Autopilot sends run here: typing pauses outlast the ~30s a webhook's waitUntil gets, a queue job has minutes.
+  // `npm run setup` creates the queue.
+  "queues": {
+    "producers": [{ "binding": "SEND_QUEUE", "queue": "magic-word-send" }],
+    "consumers": [{ "queue": "magic-word-send", "max_batch_size": 10, "max_batch_timeout": 1 }]
+  },
+  // Real-time Inbox: one Durable Object holds the open tabs' WebSockets and gets pinged on every change (src/live.ts).
+  "durable_objects": { "bindings": [{ "name": "LIVE", "class_name": "LiveHub" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["LiveHub"] }],
+  // Every minute: draft replies for threads that went quiet, send due autopilot drafts, expire stale ones.
+  "triggers": { "crons": ["* * * * *"] },
+  "vars": {
+    // The link your automations send as {{SKOOL_LINK}}: any link of yours (Settings in the console can change it later).
+    "SKOOL_LINK": "https://REPLACE_YOUR_LINK",
+    // Off until you've watched it on test threads; the console's AI switch flips it without a deploy.
+    "AUTOPILOT": "false",
+    // Autopilot send delay after drafting; capped at 5s anyway (Meta: automated replies within 30s).
+    "REPLY_DELAY_MIN_S": "2",
+    "REPLY_DELAY_MAX_S": "5",
+    "TRANSPORT": "meta",
+    // Autopilot sends look typed: seen, typing dots, a pause sized to each bubble (src/setter.ts deliver).
+    "TYPING": "true",
+    // Meta dashboard → your app → Instagram → API setup with Instagram login → "Instagram app ID" (setup asks for it).
+    "META_IG_APP_ID": "REPLACE_INSTAGRAM_APP_ID"
+  }
+  // Passwords and keys never go in this file. They live in .env, and `npm run setup` stores them encrypted in the
+  // Worker: INBOUND_SECRET, ADMIN_PASSWORD, META_VERIFY_TOKEN, META_APP_SECRET (Instagram app secret); optional
+  // ANTHROPIC_API_KEY (the AI, reading photos), ALERT_TOPIC, SKOOL_AUTH_TOKEN, REVIEW_PASSWORD, MANYCHAT_API_KEY.
+}

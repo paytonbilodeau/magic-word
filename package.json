@@ -1,0 +1,47 @@
+{
+  "name": "magic-word",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "check": "node scripts/setup.mjs check",
+    "update": "git pull --ff-only && npm ci --no-audit --no-fund && node scripts/setup.mjs update",
+    "preview": "node scripts/host.mjs",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "vitest run && node --test mcp/acceptance.mjs",
+    "typecheck": "tsc --noEmit",
+    "predeploy": "node scripts/setup.mjs preflight",
+    "postinstall": "node scripts/setup.mjs prepare",
+    "start": "node scripts/host.mjs --live",
+    "mcp": "node mcp/stdio.mjs",
+    "mcp:http": "node mcp/http.mjs",
+    "bundle:worker": "wrangler deploy --dry-run --outdir .magic-word/worker-build",
+    "example": "node examples/comment-to-dm.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.3.0",
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "esbuild": "0.28.2",
+    "jose": "6.2.18",
+    "linkedom": "0.18.15",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261028.1",
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5",
+    "wrangler": "^4.154.0"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "description": "A self-hosted ManyChat alternative for Instagram comment-to-DM automation and MCP inbox control.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/paytonbilodeau/magic-word.git"
+  },
+  "version": "0.1.0"
+}
