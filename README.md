@@ -51,7 +51,7 @@ The [MCP guide](docs/MCP.md) covers desktop clients, remote HTTPS, owner authent
 | Surface | Features |
 |---|---|
 | Instagram | Comment-to-DM with an optional public reply, DM keywords, first message, story replies and mentions, flow editor, quick replies, delays, conditions, split tests, tags, inbox and metrics |
-| Additional channels | Telegram, Messenger and WhatsApp inbound text, keyword rules, manual replies and delivery records through MCP |
+| Additional channels | Facebook Page comment-to-DM on selected posts. Telegram, Messenger and WhatsApp inbound text, keyword rules, manual replies and delivery records through MCP |
 | Agent tools | Draft and publish flows, simulate matching comments, inspect contacts, save fields, handle inbox replies, manage settings and review receipts |
 | Hosting | Node + SQLite on your hardware or VPS, or a Worker with D1 in your Cloudflare account. Both use the same application handler. |
 

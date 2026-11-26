@@ -14,4 +14,10 @@ Use `channel_connections` to check that credentials are configured. This check a
 
 These adapters require an inbound message in the last 24 hours for outgoing manual replies. Group and bot Telegram messages, other Messenger Pages, and other WhatsApp number IDs are ignored. Media, multistep Instagram graphs, WhatsApp outbound templates, broadcasts and shared-team assignment do not run on these adapters. Provider acceptance and delivery to a phone are distinct events.
 
+## Facebook Page comments
+
+Subscribe the Page to feed changes and Messenger messages. Use a Page token with `pages_messaging` and the required Page subscription and read access. Standard Access is limited to app roles. Select a regular published Page post and provide its full `PAGEID_POSTID` identifier. Use `page_comment_rules` to inspect the rules and `save_page_comment_rule` to add one. A disabled rule is a draft.
+
+A matching comment can receive one private text message, addressed to the comment ID. Magic Word suppresses additional sends to the same author on that post, suppresses webhook retries, and records expired comments. A lost provider response stays unconfirmed. Check `channel_inbox` with `channel: facebook_comments` for results. A comment by itself does not open an ordinary Messenger conversation. A private incoming message opens its 24-hour window. Page-owned posts with a known author and a matching rule are supported. Provider rules govern actual eligibility. [Meta private replies](https://developers.facebook.com/docs/messenger-platform/discovery/private-replies/) · [Page webhooks](https://developers.facebook.com/docs/graph-api/webhooks/reference/page/)
+
 [Telegram Bot API](https://core.telegram.org/bots/api) · [Messenger Page messages](https://developers.facebook.com/docs/graph-api/reference/page/messages) · [WhatsApp Business Platform](https://developers.facebook.com/documentation/business-messaging/whatsapp/overview)

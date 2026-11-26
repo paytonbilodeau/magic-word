@@ -133,6 +133,14 @@ test('real stdio client operates the default offline store and reopens its data'
     enabled: false,
     confirm: true,
   });
+  await ok(c, 'save_page_comment_rule', {
+    post_id: '55_123',
+    keyword: 'guide',
+    reply: 'Here it is',
+    enabled: false,
+    confirm: true,
+  });
+  assert.equal((await ok(c, 'page_comment_rules'))[0].post_id, '55_123');
   await c.close();
   c = await client(temp, true);
   assert.equal((await ok(c, 'fields', { lead }))[0].value, 'demo');

@@ -1,6 +1,7 @@
 // Additional adapters support inbound private text, keyword replies and human replies.
 // These channel rules are independent from the Instagram graph editor.
 import { z } from 'zod';
+import { pageCommentRules, processPageComments } from './page_comments';
 import { matches } from './comments';
 import { verifySignature } from './meta';
 import type { Env } from './setter';
@@ -103,7 +104,13 @@ function configured(c: Channel, e: Env) {
     (c === 'messenger' ? e.FB_PAGE_ID && e.FB_PAGE_TOKEN : e.WA_PHONE_ID && e.WA_TOKEN)
   );
 }
-async function deliver(channel: Channel, contact: string, text: string, env: Env): Promise<Delivered> {
+async function deliver(
+  channel: Channel,
+  contact: string,
+  text: string,
+  env: Env,
+  toComment = false,
+): Promise<Delivered> {
   const base = 'https://graph.facebook.com/v26.0/';
   const url =
     channel === 'telegram'
@@ -113,7 +120,11 @@ async function deliver(channel: Channel, contact: string, text: string, env: Env
     channel === 'telegram'
       ? { chat_id: contact, text }
       : channel === 'messenger'
-        ? { recipient: { id: contact }, messaging_type: 'RESPONSE', message: { text } }
+        ? {
+            recipient: toComment ? { comment_id: contact } : { id: contact },
+            messaging_type: 'RESPONSE',
+            message: { text },
+          }
         : { messaging_product: 'whatsapp', to: contact, type: 'text', text: { body: text } };
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (channel !== 'telegram')
@@ -158,6 +169,8 @@ export async function channelWebhook(req: Request, env: Env, channel: Channel, n
   } catch {
     return new Response('Invalid JSON', { status: 400 });
   }
+  if (channel === 'messenger')
+    await processPageComments(input, env, now, (id, text) => deliver('messenger', id, text, env, true));
   for (const m of events(channel, input, env)) {
     if (!Number.isSafeInteger(m.at) || m.at > now + 60_000 || !m.text) continue;
     const rules = await env.DB.prepare(
@@ -202,6 +215,7 @@ const replyInput = z.object({
   request_id: z.uuid(),
 });
 export async function channelAdmin(req: Request, env: Env, op: string, now = Date.now()) {
+  if (op === 'page-comments') return pageCommentRules(req, env);
   const q = new URL(req.url).searchParams;
   if (req.method === 'GET') {
     if (op === 'connections')

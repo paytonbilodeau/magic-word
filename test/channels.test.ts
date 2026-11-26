@@ -144,3 +144,102 @@ describe.each(['telegram', 'messenger', 'whatsapp'] as const)('%s text replies',
     expect((await channelWebhook(await signed(), { DB: e.DB } as Env, channel, now)).status).toBe(503);
   });
 });
+
+describe('Facebook Page comment-to-DM', () => {
+  const base = {
+    item: 'comment',
+    verb: 'add',
+    comment_id: '100_20',
+    post_id: '55_100',
+    message: 'GUIDE please',
+    from: { id: '77' },
+    created_time: now / 1000,
+  };
+  const setup = async (e: Env) =>
+    channelAdmin(
+      post({ post_id: '55_100', keyword: 'guide', reply: 'Your guide', enabled: true }),
+      e,
+      'page-comments',
+      now,
+    );
+  async function webhook(e: Env, over: Record<string, unknown> = {}, page = '55') {
+    const body = {
+      object: 'page',
+      entry: [{ id: page, changes: [{ field: 'feed', value: { ...base, ...over } }] }],
+    };
+    return channelWebhook(
+      post(body, { 'X-Hub-Signature-256': 'sha256=' + (await hmacHex('meta', JSON.stringify(body))) }),
+      e,
+      'messenger',
+      now,
+    );
+  }
+  it('addresses the comment once and keeps the Messenger window closed until a DM arrives', async () => {
+    const e = env();
+    await setup(e);
+    const transport = vi.fn(async () => Response.json({ message_id: 'p1' }));
+    vi.stubGlobal('fetch', transport);
+    await webhook(e);
+    await webhook(e);
+    await webhook(e, { comment_id: '100_21' });
+    expect(transport).toHaveBeenCalledTimes(1);
+    const [url, init] = transport.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toMatch(/\/55\/messages$/);
+    expect(JSON.parse(String(init.body)).recipient).toEqual({ comment_id: '100_20' });
+    expect((await e.DB.prepare('SELECT state FROM channel_events ORDER BY event_id').all()).results).toEqual([
+      { state: 'accepted' },
+      { state: 'already_replied' },
+    ]);
+    expect(
+      (
+        await channelAdmin(
+          post({ channel: 'messenger', contact: '77', text: 'next', request_id: crypto.randomUUID() }),
+          e,
+          'reply',
+          now,
+        )
+      ).status,
+    ).toBe(409);
+  });
+  it('ignores unselected posts, Page activity, edits and unrelated words; records an expired matching comment', async () => {
+    const e = env();
+    await setup(e);
+    const transport = vi.fn();
+    vi.stubGlobal('fetch', transport);
+    await webhook(e, { verb: 'edited' });
+    await webhook(e, { from: { id: '55' } });
+    await webhook(e, { post_id: '55_200' });
+    await webhook(e, {}, '66');
+    await webhook(e, { message: 'guideline' });
+    await webhook(e, { created_time: (now - 7 * 86400000) / 1000 });
+    expect(transport).not.toHaveBeenCalled();
+    expect((await e.DB.prepare('SELECT state FROM channel_events').all()).results).toEqual([
+      { state: 'expired' },
+    ]);
+  });
+  it('holds an ambiguous send and permits a new person to request their own guide', async () => {
+    const e = env();
+    await setup(e);
+    const transport = vi.fn(async () => {
+      throw Error('unconfirmed');
+    });
+    vi.stubGlobal('fetch', transport);
+    await webhook(e);
+    await webhook(e, { comment_id: '100_21' });
+    await webhook(e, { comment_id: '100_22', from: { id: '78' } });
+    expect(transport).toHaveBeenCalledTimes(2);
+    expect(
+      await e.DB.prepare("SELECT count(*) AS n FROM channel_events WHERE state='unknown'").first(),
+    ).toEqual({ n: 2 });
+    expect(
+      (
+        await channelAdmin(
+          post({ post_id: '66_88', keyword: 'guide', reply: 'wrong Page', enabled: true }),
+          e,
+          'page-comments',
+          now,
+        )
+      ).status,
+    ).toBe(409);
+  });
+});

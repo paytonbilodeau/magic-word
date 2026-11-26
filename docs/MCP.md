@@ -51,6 +51,7 @@ For a client that can supply a static Authorization header, the alternate gatewa
 - Inspect templates and edit the full Instagram graph. Create, rename, duplicate, publish, toggle, trash, restore or purge a flow. Manage folders and bulk moves. Simulate a comment match without sending.
 - Read comments, threads, tags, fields, metrics, reached audiences, connection health, preferences and pending deletion requests. Page through large results.
 - Reply, react, tag, pause, resume, manage contact fields, set account/individual AI behavior, edit learned answers and update Instagram conversation starters or the menu.
+- Set a private keyword reply for a particular Facebook Page post, and inspect provider receipts in the Facebook comments inbox.
 - Configure and inspect keyword rules for Telegram, Messenger and WhatsApp. Review their text inboxes and send eligible manual replies using a stable request ID.
 
 Use `tools/list` for the current names, argument schemas and effect annotations. A tool that can publish, send or erase content requires explicit intent. Credentials, provider account consent, infrastructure provisioning and access review stay with the operator. The SDK acceptance suite covers stdio and authenticated HTTP. Live ChatGPT consent and named third-party client UIs require their own installation tests.
