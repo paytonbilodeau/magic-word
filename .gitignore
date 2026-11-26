@@ -1,0 +1,25 @@
+# Yours: your settings, your passwords, your own page of setup instructions. Never committed.
+.env
+.env.*
+!.env.example
+.dev.vars
+/magic-word.config.json
+/MY-SETUP.md
+
+# Built by `npm run setup` from templates/ and magic-word.config.json.
+/wrangler.jsonc
+/src/brand.ts
+
+# The optional AI's script. Copied from templates/ once, then yours to write. Forking to keep your own version in git?
+# Delete these two lines.
+/src/prompt.ts
+/src/knowledge.ts
+
+node_modules/
+.wrangler/
+.backfill/
+.DS_Store
+
+# Self-hosted SQLite store, local MCP credentials and compiled host.
+.magic-word/
+.dev.vars.*

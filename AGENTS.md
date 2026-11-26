@@ -1,0 +1,10 @@
+# Set up Magic Word for this AI
+
+When the user gives you this repository URL and asks for setup, carry the installation through the first verified example.
+
+1. Use an existing checkout if present. Otherwise clone `https://github.com/paytonbilodeau/magic-word.git` into a stable user-owned projects directory. The MCP registration points to this copy. Inspect the README and setup script. Check for Node 24 or 26 and npm. If Node is missing, use the user's existing version manager to install Node 24 LTS when available.
+2. From the repository directory run `npm ci`. Run `npm run setup:ai` for Claude Code and Codex. In Cursor use `npm run setup:ai -- --client cursor`. For Gemini CLI use `npm run setup:ai -- --client gemini`. An assistant using another local client can run `npm run setup:ai -- --client json` and register the printed server entry using the client's supported settings.
+3. The command checks a real MCP client against a fresh fictional inbox, verifies that GUIDE matches, and registers the local server. A second run preserves an existing matching entry. If the client's tool list is already open, reload it or open a new chat. Invoke Magic Word's `status` tool when available and report its mode. An offline example alone verifies the server, while a call through the user's client also verifies that client.
+4. If the user wants the browser console, start `npm run preview` and open the local URL it prints. Choose **Open sample inbox**. If they asked for live channels, continue to [Docker Compose or Node hosting](docs/SELF-HOST.md) or [Cloudflare setup](SETUP.md), then [provider connections](docs/CHANNELS.md). The service operator supplies the hosting destination and completes provider consent. Keep secrets in the host's private environment.
+
+For development, run `npm run typecheck`, `npm test` and `npm run bundle:worker`. See [MCP](docs/MCP.md) for authenticated HTTPS clients including ChatGPT. The Instagram engine and Cloudflare installer derive from [FewChat](NOTICE.md).
