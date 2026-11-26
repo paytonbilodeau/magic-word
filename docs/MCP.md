@@ -42,7 +42,7 @@ Run the gateway beside the backend or on another host with access to it. It list
 
 Configure the issuer to mint expiring RS256 or ES256 access tokens targeted at the **full public MCP URL**, with the owner as subject. Grant `magic-word.read` for reads and both `magic-word.read magic-word.write` for writes. Configure the client registration and its redirect URI at the issuer, with PKCE support. The gateway publishes protected-resource metadata at `/.well-known/oauth-protected-resource/mcp`. Route that path and `/mcp` to the gateway. Start it with `node --env-file=/absolute/path/to/private.env mcp/http.mjs`.
 
-In a ChatGPT workspace that supports custom MCP apps, enter the public HTTPS MCP URL and select OAuth. Complete consent at your issuer. Other remote MCP clients can use the same server if they support Streamable HTTP and a compatible authentication method. Grok and Antigravity compatibility depends on the client surface, version and policy. Use a supported connector or client bridge for products without native MCP imports. [MCP authorization specification](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization) · [ChatGPT app authentication](https://developers.openai.com/apps-sdk/build/auth/)
+In a ChatGPT workspace that supports custom MCP apps, enter the public HTTPS MCP URL and select OAuth. Complete consent at your issuer. Other remote MCP clients can use the same server if they support Streamable HTTP and a compatible authentication method. The Grok API supports remote MCP. An Antigravity IDE installation with a custom MCP server editor can use the local entry above. Instructions for these clients follow below. [MCP authorization specification](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization) · [ChatGPT app authentication](https://developers.openai.com/apps-sdk/build/auth/)
 
 For a client that can supply a static Authorization header, the alternate gateway mode accepts a separately generated `MAGICWORD_MCP_TOKEN` of at least 32 characters. Keep it separate from the backend password. OAuth mode disables static-token fallback. No public endpoint is opened by installation.
 
@@ -55,3 +55,17 @@ For a client that can supply a static Authorization header, the alternate gatewa
 - Configure and inspect keyword rules for Telegram, Messenger and WhatsApp. Review their text inboxes and send eligible manual replies using a stable request ID.
 
 Use `tools/list` for the current names, argument schemas and effect annotations. A tool that can publish, send or erase content requires explicit intent. Credentials, provider account consent, infrastructure provisioning and access review stay with the operator. The SDK acceptance suite covers stdio and authenticated HTTP. Live ChatGPT consent and named third-party client UIs require their own installation tests.
+
+
+## Client-specific setup
+
+| Client | What to give it | First check |
+|---|---|---|
+| Claude Code and Codex | Give the agent the repository URL and ask for setup. The installer registers local stdio. | Open a fresh session and ask for Magic Word status. |
+| Cursor | Run `npm run setup:ai -- --client cursor`. The installer adds only the Magic Word entry to the user MCP config. | Enable the server in MCP settings and call `status`. [Cursor MCP](https://cursor.com/docs/mcp) |
+| Gemini CLI | Run `npm run setup:ai -- --client gemini`. The installer adds the same local server to Gemini user settings. | Open Gemini CLI, inspect the server with `/mcp` and ask for status. [Gemini MCP](https://geminicli.com/docs/tools/mcp-server/) |
+| Google Antigravity IDE | Run `npm run setup:ai -- --client json`. Add its `magic-word` server entry in Antigravity's custom MCP settings. | Refresh the configured servers and request status. [Antigravity MCP](https://antigravity.google/docs/ide-mcp) |
+| ChatGPT | Configure a custom MCP app with the public HTTPS URL and owner OAuth described above. Availability depends on workspace settings. | Complete OAuth and call `status`. |
+| Grok via the xAI API | Add a remote MCP object to the Responses API request's `tools`. Set `type` to `mcp`, `server_url` to your public `/mcp` endpoint and `server_label` to `magic_word`. Supply a private `headers.Authorization` bearer value at runtime. | Start with `allowed_tools: ["status"]` and inspect the result. The model API and remote host may incur costs. [xAI remote MCP](https://docs.x.ai/developers/tools/remote-mcp) |
+
+The acceptance suite uses the official MCP client over both transports. Each hosted assistant still needs its own account, authorization flow and connection test.
