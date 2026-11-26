@@ -121,7 +121,7 @@ export function connection(env = process.env, request = globalThis.fetch) {
   };
 }
 export function createServer(call = connection(), readOnly = false) {
-  const server = new McpServer({ name: 'magic-word', version: '0.1.0' });
+  const server = new McpServer({ name: 'magic-word', version: '0.2.0' });
   function tool(name, description, shape, run, mode = 'read') {
     if (readOnly && mode !== 'read') return;
     server.registerTool(
@@ -462,11 +462,29 @@ export function createServer(call = connection(), readOnly = false) {
     {},
     'channels/connections',
   );
+  view('page_comment_rules', 'List Facebook Page post comment-to-DM rules.', {}, 'channels/page-comments');
+  tool(
+    'save_page_comment_rule',
+    'Set a keyword private reply on a regular published Facebook Page post. A matched comment can receive one private message.',
+    {
+      post_id: z.string().regex(/^\d+_\d+$/),
+      keyword: z.string().min(1).max(200),
+      reply: z.string().min(1).max(1000),
+      enabled: z.boolean(),
+      ...confirmation,
+    },
+    (a) => call('/admin/api/channels/page-comments', { method: 'POST', json: a }),
+    'live',
+  );
   view('channel_rules', 'List additional channel keyword rules.', {}, 'channels/rules');
   view(
     'channel_inbox',
     'Read inbound text, replies and provider receipts on the additional channels.',
-    { channel: channel.optional(), contact: short.optional(), offset: paging.offset },
+    {
+      channel: z.enum([...channel.options, 'facebook_comments']).optional(),
+      contact: short.optional(),
+      offset: paging.offset,
+    },
     'channels/inbox',
   );
   tool(
