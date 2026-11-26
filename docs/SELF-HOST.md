@@ -4,6 +4,21 @@
 
 Run `npm ci` and `npm run preview` with Node 24 or 26. Open `http://127.0.0.1:8791/admin/dashboard`. Choose **Open sample inbox**. The demo account and conversations are synthetic. Outbound requests from the application process are disabled. The stdio MCP opens this same SQLite store without a running HTTP server.
 
+## Docker Compose with automatic HTTPS
+
+Use a host you control with Docker Compose installed, a public hostname pointing to it and inbound ports 80 and 443 available. The repository includes the app, SQLite volume and Caddy HTTPS reverse proxy. From the checkout on that host:
+
+```sh
+cp -n deploy/host.env.example .env.host
+chmod 600 .env.host
+# Set the public hostname, business name and contact email in .env.host.
+docker compose --env-file .env.host up -d --build
+```
+
+Open your HTTPS hostname. Read the owner password privately with `docker compose --env-file .env.host exec app node -p "require('/data/live/credentials.json').ADMIN_PASSWORD"`. The verify token for Meta is in the same file. For Instagram, set the three Instagram values in `.env.host`, rerun Compose and follow the webhook and consent steps below. The database and owner credentials persist in the `inbox` volume. Caddy stores certificates in its own volume. Domain, server and provider charges depend on your setup. [Caddy automatic HTTPS](https://caddyserver.com/docs/automatic-https)
+
+For remote MCP, configure owner OAuth or the separate random gateway token from [the MCP guide](MCP.md) in `.env.host`, then run `docker compose --env-file .env.host --profile mcp up -d --build`. The endpoint is `https://YOUR_HOST/mcp`. Only Caddy publishes host ports. Plain stdio clients can also connect directly to the console using `MAGICWORD_URL` and a private owner credential.
+
 ## A machine with a public HTTPS address
 
 The Node host runs the Instagram Worker handler against SQLite on local disk. It uses a one-minute timer for due flows. The inbox polls on this host. On Cloudflare, the Durable Object also supplies WebSocket updates. Cloudflare Workers AI transcription needs a compatible binding and is unavailable on the standalone host. Keep one production HTTP process per database so there is one scheduler.

@@ -26,12 +26,29 @@ jobs:
       - run: npm test
       - run: npm run setup:ai -- --client json
       - run: npm run bundle:worker
+  container:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Validate Compose and run the production image with fixtures
+        run: |
+          cp deploy/host.env.example .env.host
+          docker compose --env-file .env.host --profile mcp config -q
+          docker build -t magic-word:ci .
+          docker run -d --name sample -p 127.0.0.1:18791:8791 -e MAGICWORD_BUSINESS=Example -e MAGICWORD_CONTACT_EMAIL=hello@example.org -e MAGICWORD_PUBLIC_URL=https://inbox.example.org -e MAGICWORD_BIND=0.0.0.0 magic-word:ci
+          curl --retry 15 --retry-delay 1 --retry-all-errors -fsS http://127.0.0.1:18791/login | grep -q 'Magic Word'
+          docker exec sample node examples/comment-to-dm.mjs
+          docker compose --env-file .env.host run --rm --no-deps https caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
   quality:
     name: Repository quality
     if: always()
-    needs: tests
+    needs: [tests, container]
     runs-on: ubuntu-24.04
     steps:
-      - run: test "$TESTS" = success
+      - run: test "$TESTS" = success && test "$CONTAINER" = success
         env:
           TESTS: ${{ needs.tests.result }}
+          CONTAINER: ${{ needs.container.result }}

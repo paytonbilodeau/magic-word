@@ -1,0 +1,9 @@
+{$MAGICWORD_HOST} {
+    @agent path /mcp /.well-known/oauth-protected-resource /.well-known/oauth-protected-resource/mcp
+    handle @agent {
+        reverse_proxy agent:8792
+    }
+    handle {
+        reverse_proxy app:8791
+    }
+}

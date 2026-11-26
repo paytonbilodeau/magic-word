@@ -130,7 +130,7 @@ export function gateway(env = process.env, call = connection(env), keySet = crea
 }
 import { pathToFileURL } from 'node:url';
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  gateway().listen(Number(process.env.MAGICWORD_MCP_PORT || 8792), '127.0.0.1', () =>
-    console.log('Remote MCP gateway listening on loopback.'),
+  gateway().listen(Number(process.env.MAGICWORD_MCP_PORT || 8792), process.env.MAGICWORD_MCP_BIND || '127.0.0.1', () =>
+    console.log('Remote MCP gateway listening.'),
   );
 }

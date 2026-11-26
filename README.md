@@ -57,7 +57,7 @@ The [MCP guide](docs/MCP.md) covers desktop clients, remote HTTPS, owner authent
 
 The core needs no model API key and has no per-contact software charge. Live channels need provider credentials, an HTTPS webhook and applicable permissions. Optional AI replies and external services can incur charges. TikTok, SMS, email delivery and team campaign management have no transport or service in this release.
 
-- [Self-host Node and SQLite](docs/SELF-HOST.md)
+- [Deploy with Docker Compose and HTTPS, or run Node and SQLite directly](docs/SELF-HOST.md)
 - [Cloudflare and Instagram setup](SETUP.md)
 - [Connect more channels](docs/CHANNELS.md)
 - [Manychat pricing, feature comparison and public-source audit](docs/MANYCHAT.md)
