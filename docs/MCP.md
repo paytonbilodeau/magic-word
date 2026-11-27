@@ -28,9 +28,15 @@ For clients with a JSON stdio configuration, including compatible Cursor and Gem
 
 To operate a real account, set `MAGICWORD_URL` and `MAGICWORD_PASSWORD_FILE` in the MCP process environment. Use a private JSON file containing the console's `ADMIN_PASSWORD`, with mode 0600 on Unix. A process-level `MAGICWORD_ADMIN_PASSWORD` also works. Keep credentials out of committed client configurations. `MAGICWORD_READ_ONLY=1` excludes all write tools from the catalog.
 
+## Connect this checkout to your Cloudflare deployment
+
+After Cloudflare setup prints your live URL, run `npm run connect:host`. The command authenticates to the public `/mcp`, lists its tools and calls `status` before switching this checkout’s local MCP clients to the production console. Open a new client session. The fixture example still runs in an isolated store. Removing `.magic-word/hosted.json` selects the sample inbox again.
+
+Cloudflare serves the console and MCP on the same origin. A client supporting custom headers can connect to `https://<worker>/mcp` with `Authorization: Bearer <MAGICWORD_MCP_TOKEN>`. The installer generates the token in the private `.env` and stores it as a Worker secret. For an existing deployment, rerun setup to generate and install the token. Configure the OAuth issuer, owner and signing keys described below for OAuth-only clients.
+
 ## Remote clients and ChatGPT
 
-Run the gateway beside the backend or on another host with access to it. It listens on loopback port 8792. Expose only the TLS reverse proxy. Configure:
+For Node or Docker, run the gateway beside the backend or on another host with access to it. It listens on loopback port 8792. Expose only the TLS reverse proxy. Configure:
 
 | Setting | Value |
 |---|---|

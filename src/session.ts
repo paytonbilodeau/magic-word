@@ -44,7 +44,7 @@ export async function ownerId(env: Env): Promise<string | null> {
 // into the app mid-sign-in. Phones only get the password form (iCloud Keychain saves it, Face ID fills it).
 export const isPhone = (req: Request | null) => /iPhone|iPad|iPod|Android/i.test(req?.headers.get("User-Agent") ?? "");
 
-export function loginPage(error: string | null = null, req: Request | null = null, demo = false): Response {
+export function loginPage(error: string | null = null, req: Request | null = null, demo = false, instagramReady = true): Response {
   const phone = demo || isPhone(req);
   const ig = `<a class="btn" href="/auth/login">Log in with Instagram</a>`;
   const pw = `<form method="post" action="/login" class="pw">
@@ -68,9 +68,9 @@ a.btn:hover{background:#1877f2}.err{color:#ed4956;margin:0 0 18px}.alt{display:b
 .hint{color:var(--mut);font-size:12px;margin:10px 0 0}
 </style></head><body><main>
 <div class="logo" aria-hidden="true">${LOGO}</div>
-<h1>Magic Word</h1><p>${demo ? "Explore the sample inbox with fictional contacts." : phone ? "Log in to Magic Word." : "Log in with the Instagram account Magic Word runs on."}</p>
+<h1>Magic Word</h1><p>${demo ? "Explore the sample inbox with fictional contacts." : !instagramReady ? "Log in with your Magic Word owner password." : phone ? "Log in to Magic Word." : "Log in with the Instagram account Magic Word runs on."}</p>
 ${error ? `<p class="err">${error.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`)}</p>` : ""}
-${demo ? `<form method="post" action="/login" class="pw"><button type="submit" name="sample" value="open">Open sample inbox</button></form>` : phone ? `${pw}<p class="hint">You stay logged in for 90 days. Your phone can save this and fill it with Face ID.</p>` : `<div class="ig">${ig}<div class="or">OR</div></div>${pw}`}
+${demo ? `<form method="post" action="/login" class="pw"><button type="submit" name="sample" value="open">Open sample inbox</button></form>` : !instagramReady ? pw : phone ? `${pw}<p class="hint">You stay logged in for 90 days. Your phone can save this and fill it with Face ID.</p>` : `<div class="ig">${ig}<div class="or">OR</div></div>${pw}`}
 </main><script>/* iPads and "desktop site" phones look like a Mac to the server: drop the Instagram button on touch screens */
 if (navigator.maxTouchPoints > 1) document.querySelectorAll(".ig").forEach((e) => e.remove());</script></body></html>`,
     { status: error ? 403 : 200, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } },

@@ -125,6 +125,8 @@ export const env = {
   HOST_MODE: live ? 'live' : 'demo',
 };
 for (const key of [
+  'YOUTUBE_CHANNEL_ID',
+  'YOUTUBE_DATA_API_KEY',
   'TG_BOT_TOKEN',
   'TG_WEBHOOK_SECRET',
   'CHANNEL_META_SECRET',

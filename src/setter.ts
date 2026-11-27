@@ -17,6 +17,8 @@ import { meter } from "./usage";
 
 export interface Env {
   HOST_MODE?: string;
+  YOUTUBE_CHANNEL_ID?: string;
+  YOUTUBE_DATA_API_KEY?: string;
   TG_BOT_TOKEN?: string;
   TG_WEBHOOK_SECRET?: string;
   CHANNEL_META_SECRET?: string;
