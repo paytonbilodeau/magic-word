@@ -1,5 +1,6 @@
 // Owner-only structured reads shared by local and remote MCP clients. Keep credentials out of every response.
 import { socialRead } from './social-reads';
+import { IG_HANDLE } from './brand';
 import { youtubeRead } from './youtube';
 import { manualReply, windowLeft } from './dashboard';
 import { getLead } from './db';
@@ -174,6 +175,7 @@ export async function agentRead(env: Env, req: Request, view: string): Promise<R
     case 'status':
       return ok({
         mode: env.HOST_MODE || 'worker',
+        instagram_handle: IG_HANDLE,
         instagram_connected: Boolean(await getSetting(env.DB, 'ig_token')),
         ai_blocker: aiBlocker(env),
         config: await getConfig(env),

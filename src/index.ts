@@ -88,6 +88,7 @@ async function handleAuth(req: Request, env: Env, pathname: string): Promise<Res
   const url = new URL(req.url);
   const redirectUri = `${url.origin}/auth/callback`;
   if (pathname === "/auth/start" || pathname === "/auth/login") {
+    if (!env.META_APP_SECRET || !/^\d+$/.test(env.META_IG_APP_ID)) return Response.redirect(url.origin + "/login", 302);
     // /auth/start reconnects the account (admins only); /auth/login is the console's sign-in, open to anyone,
     // since the callback only lets the account this setter runs through.
     if (pathname === "/auth/start" && (await role(req, env)) !== "admin") return Response.redirect(`${url.origin}/login`, 302);
@@ -212,10 +213,10 @@ async function route(req: Request, env: Env, ctx: ExecutionContext): Promise<Res
       const form = await req.formData().catch(() => null);
       const pw = String(form?.get("password") ?? "");
       const localDemo = env.HOST_MODE === "demo" && new URL(req.url).hostname === "127.0.0.1" && origin === new URL(req.url).origin && form?.get("sample") === "open";
-      if (!localDemo && (!env.ADMIN_PASSWORD || pw !== env.ADMIN_PASSWORD)) return loginPage("Wrong password.", req, env.HOST_MODE === "demo");
+      if (!localDemo && (!env.ADMIN_PASSWORD || pw !== env.ADMIN_PASSWORD)) return loginPage("Wrong password.", req, env.HOST_MODE === "demo", Boolean(env.META_APP_SECRET && /^\d+$/.test(env.META_IG_APP_ID)));
       return new Response(null, { status: 303, headers: { Location: `${new URL(req.url).origin}/admin/dashboard`, "Set-Cookie": await sessionCookie(env, Date.now()) } });
     }
-    if (pathname === "/login") return (await role(req, env)) === "admin" ? Response.redirect(`${new URL(req.url).origin}/admin/dashboard`, 302) : loginPage(null, req, env.HOST_MODE === "demo");
+    if (pathname === "/login") return (await role(req, env)) === "admin" ? Response.redirect(`${new URL(req.url).origin}/admin/dashboard`, 302) : loginPage(null, req, env.HOST_MODE === "demo", Boolean(env.META_APP_SECRET && /^\d+$/.test(env.META_IG_APP_ID)));
     if (pathname === "/logout") return new Response(null, { status: 303, headers: { Location: "/login", "Set-Cookie": clearCookie } });
     if ((pathname === "/deauthorize" || pathname === "/data-deletion") && req.method === "POST") return handleRevoke(req, env, pathname);
     const click = pathname.match(/^\/f\/(\d+)(?:\/([A-Za-z0-9_-]+))?$/);

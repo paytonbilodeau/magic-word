@@ -13,6 +13,10 @@ export function withComposio(call, cfg) {
   ]);
   return async (path, options = {}) => {
     const view = path.slice('/admin/api/'.length);
+    if (path === '/admin/api/status' && (options.method || 'GET') === 'GET') {
+      const status = await call(path, options);
+      return { ...status, local_instagram_reads: { configured: Boolean(cfg.accounts?.instagram), handle: cfg.instagramHandle }, native_instagram_webhook_connected: status.instagram_connected };
+    }
     const channel = view.startsWith('instagram_') ? 'instagram' : 'youtube';
     if (
       !path.startsWith('/admin/api/') ||
