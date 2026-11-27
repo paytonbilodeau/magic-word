@@ -200,6 +200,7 @@ async function route(req: Request, env: Env, ctx: ExecutionContext): Promise<Res
   {
     const { pathname } = new URL(req.url);
 
+    if (pathname === "/" && req.method === "GET") return Response.redirect(new URL("/login", req.url).href, 302);
     const origin = req.headers.get("Origin");
     if (req.method === "POST" && origin && origin !== new URL(req.url).origin && (pathname.startsWith("/admin") || pathname === "/login")) return new Response("Invalid origin", { status: 403 });
     const channel = pathname.match(/^\/hooks\/(telegram|messenger|whatsapp)$/)?.[1] as "telegram"|"messenger"|"whatsapp"|undefined;

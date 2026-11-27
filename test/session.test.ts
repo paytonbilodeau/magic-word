@@ -201,6 +201,8 @@ it("owner reconnect accepts only the configured Instagram handle on a new instal
 
 it("offers the owner password until native Instagram credentials are ready", async () => {
   const env = { ...makeEnv(), META_IG_APP_ID: "REPLACE_INSTAGRAM_APP_ID", META_APP_SECRET: "" };
+  const home = await worker.fetch(new Request("https://x/"), env, ctx);
+  expect(home.headers.get("location")).toBe("https://x/login");
   const page = await worker.fetch(new Request("https://x/login"), env, ctx);
   const html = await page.text();
   expect(html).toContain('name="password"');
