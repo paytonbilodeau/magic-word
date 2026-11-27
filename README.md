@@ -52,8 +52,9 @@ The [MCP guide](docs/MCP.md) covers desktop clients, remote HTTPS, owner authent
 |---|---|
 | Instagram | Comment-to-DM with an optional public reply, DM keywords, first message, story replies and mentions, flow editor, quick replies, delays, conditions, split tests, tags, inbox and metrics |
 | Additional channels | Facebook Page comment-to-DM on selected posts. Telegram, Messenger and WhatsApp inbound text, keyword rules, manual replies and delivery records through MCP |
+| YouTube | Read recent uploads without a key. Read public comment threads with a YouTube API key or a local Composio connection. |
 | Agent tools | Draft and publish flows, simulate matching comments, inspect contacts, save fields, handle inbox replies, manage settings and review receipts |
-| Hosting | Node + SQLite on your hardware or VPS, or a Worker with D1 in your Cloudflare account. Both use the same application handler. |
+| Hosting | Node + SQLite on your hardware or VPS, or a Worker with D1 in your Cloudflare account. The Worker serves the console and authenticated MCP at the same HTTPS address. |
 
 The core needs no model API key and has no per-contact software charge. Live channels need provider credentials, an HTTPS webhook and applicable permissions. Optional AI replies and external services can incur charges. TikTok, SMS, email delivery and team campaign management have no transport or service in this release.
 

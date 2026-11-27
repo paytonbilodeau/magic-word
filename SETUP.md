@@ -111,3 +111,7 @@ Done = both worked. Show them where things are: the console address, `MY-SETUP.m
 - **AI replies (beta)**: docs/AI.md. When they say "help me write the AI script": interview them one short question at a time (what they sell, the price, what's inside, real member results, who buys), and ask them to paste 10 to 20 messages they really typed to people in their DMs. Build the voice from those messages, not from adjectives. Fill every `<<FILL: ...>>` in `src/prompt.ts` and `src/knowledge.ts`, keep the framework, objections and actions as written, then `npm run setup`. They add `ANTHROPIC_API_KEY=` to `.env` themselves.
 - **Also running Manychat on this account?** Test one keyword on a controlled account first. Deactivate the equivalent rule in the old tool before activating the new one. Check Meta conversation routing and inspect the actual receipt.
 - **Past conversations**: `scripts/backfill.mjs` imports DM history (CLAUDE.md, Lab Notes). 90 days is plenty.
+
+## Use the hosted account from your AI
+
+Once setup reports a public Worker URL, run `npm run connect:host`. The command verifies an authenticated MCP call before selecting the deployment in your local AI clients. The remote endpoint is `<url>/mcp`. Keep the console password and MCP bearer in the private installer files. See [MCP setup](docs/MCP.md) and [channel connections](docs/CHANNELS.md).

@@ -245,3 +245,16 @@ test('OAuth discovery, owner binding, write scopes and resource audience', async
     await c.close();
   }
 });
+
+test('remote endpoint rejects foreign origins, large bodies, unsupported methods and malformed JSON', async t => {
+  const token='test-only-fixture-'.repeat(3);
+  const app=gateway({ MAGICWORD_MCP_TOKEN:token, MAGICWORD_MCP_PUBLIC_URL:'https://magic.example/mcp' }, async()=>({}));
+  await new Promise(resolve=>app.listen(0,'127.0.0.1',resolve));
+  t.after(()=>app.close());
+  const url='http://127.0.0.1:'+app.address().port+'/mcp';
+  const headers={Authorization:'Bearer '+token};
+  assert.equal((await fetch(url,{method:'POST',headers:{...headers,Origin:'https://other.example'}})).status,403);
+  assert.equal((await fetch(url,{headers})).status,405);
+  assert.equal((await fetch(url,{method:'POST',headers,body:'{'})).status,400);
+  assert.equal((await fetch(url,{method:'POST',headers,body:' '.repeat(1024*1024+1)})).status,413);
+});

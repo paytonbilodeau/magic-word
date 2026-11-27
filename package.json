@@ -18,6 +18,7 @@
     "mcp:http": "node mcp/http.mjs",
     "bundle:worker": "wrangler deploy --dry-run --outdir .magic-word/worker-build",
     "example": "node examples/comment-to-dm.mjs",
+    "connect:host": "node scripts/connect-host.mjs",
     "setup:ai": "node scripts/setup-ai.mjs"
   },
   "dependencies": {
@@ -45,5 +46,5 @@
     "type": "git",
     "url": "https://github.com/paytonbilodeau/magic-word.git"
   },
-  "version": "0.2.0"
+  "version": "0.3.0"
 }

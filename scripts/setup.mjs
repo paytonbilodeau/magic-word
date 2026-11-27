@@ -15,7 +15,7 @@
 
 import { spawnSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
-import { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { appendFileSync, chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
@@ -184,14 +184,15 @@ function readEnv() {
   return out;
 }
 function setEnv(key, value) {
-  if (!existsSync(ENV_FILE)) copyFileSync(at(".env.example"), ENV_FILE);
+  if (!existsSync(ENV_FILE)) writeFileSync(ENV_FILE, readFileSync(at(".env.example")), { mode: 0o600 });
+  if (process.platform !== "win32") chmodSync(ENV_FILE, 0o600);
   const lines = readFileSync(ENV_FILE, "utf8").split(/\r?\n/);
   const i = lines.findIndex((l) => l.startsWith(`${key}=`));
   if (i >= 0) lines[i] = `${key}=${value}`;
   else lines.push(`${key}=${value}`);
   writeFileSync(ENV_FILE, lines.join("\n").replace(/\n*$/, "\n"));
 }
-const SECRET_NAMES = ["INBOUND_SECRET", "ADMIN_PASSWORD", "META_VERIFY_TOKEN", "META_APP_SECRET", "ANTHROPIC_API_KEY", "REVIEW_PASSWORD", "SKOOL_AUTH_TOKEN", "ALERT_TOPIC", "MANYCHAT_API_KEY"];
+const SECRET_NAMES = ["YOUTUBE_CHANNEL_ID", "YOUTUBE_DATA_API_KEY", "MAGICWORD_MCP_TOKEN", "INBOUND_SECRET", "ADMIN_PASSWORD", "META_VERIFY_TOKEN", "META_APP_SECRET", "ANTHROPIC_API_KEY", "REVIEW_PASSWORD", "SKOOL_AUTH_TOKEN", "ALERT_TOPIC", "MANYCHAT_API_KEY"];
 const hex = (bytes) => randomBytes(bytes).toString("hex");
 // A password a person can read and type: four groups, no look-alike characters.
 function password() {
@@ -678,7 +679,7 @@ async function setup() {
   step("Passwords and keys", "Made on this computer, saved in .env, and stored encrypted in your Worker.");
   const env = readEnv();
   let made = 0;
-  for (const [k, make] of [["INBOUND_SECRET", () => hex(16)], ["META_VERIFY_TOKEN", () => hex(16)], ["ADMIN_PASSWORD", password]]) {
+  for (const [k, make] of [["MAGICWORD_MCP_TOKEN", () => hex(32)], ["INBOUND_SECRET", () => hex(16)], ["META_VERIFY_TOKEN", () => hex(16)], ["ADMIN_PASSWORD", password]]) {
     if (!env[k]) {
       setEnv(k, make());
       made++;
@@ -765,7 +766,7 @@ async function check() {
 
   const env = readEnv();
   const listed = wrangler(["secret", "list", "--name", c.worker_name]);
-  const missing = ["INBOUND_SECRET", "ADMIN_PASSWORD", "META_VERIFY_TOKEN", "META_APP_SECRET"].filter((k) => !listed.out.includes(`"${k}"`));
+  const missing = ["MAGICWORD_MCP_TOKEN", "INBOUND_SECRET", "ADMIN_PASSWORD", "META_VERIFY_TOKEN", "META_APP_SECRET"].filter((k) => !listed.out.includes(`"${k}"`));
   if (listed.ok && missing.length) no(`Missing in the Worker: ${missing.join(", ")}`, missing.includes("META_APP_SECRET") && !env.META_APP_SECRET ? "The Meta app isn't finished. Run `npm run setup`." : "Run `npm run setup`: it stores them again.");
   else if (listed.ok) ok("Passwords and keys are stored");
 

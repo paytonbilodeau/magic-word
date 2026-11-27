@@ -177,3 +177,24 @@ describe("password form", () => {
     expect(desk.indexOf("Log in with Instagram")).toBeLessThan(desk.indexOf('autocomplete="current-password"'));
   });
 });
+
+it("owner reconnect accepts only the configured Instagram handle on a new installation", async () => {
+  const env = makeEnv();
+  env.REVIEW_PASSWORD = "";
+  const basic = "Basic " + btoa("owner:pw");
+  for (const handle of ["anothercreator", "yourhandle"]) {
+    meName = handle;
+    const start = await worker.fetch(new Request("https://x/auth/start", { headers: { Authorization: basic } }), env, ctx);
+    const state = new URL(start.headers.get("Location")!).searchParams.get("state");
+    const done = await worker.fetch(new Request("https://x/auth/callback?code=test&state=" + encodeURIComponent(state!), { headers: { Authorization: basic, Cookie: cookieOf(start) } }), env, ctx);
+    if (handle === "anothercreator") {
+      expect(done.status).toBe(403);
+      expect(await db.getSetting(env.DB, "ig_token")).toBeNull();
+      expect(await db.getSetting(env.DB, "review_ig_token")).toBeNull();
+      expect(calls.some(url => url.includes("subscribed_apps"))).toBe(false);
+    } else {
+      expect(done.status).toBe(303);
+      expect(await db.getSetting(env.DB, "ig_account_id")).toBe(OWNER);
+    }
+  }
+});

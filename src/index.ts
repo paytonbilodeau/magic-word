@@ -135,11 +135,19 @@ async function handleAuth(req: Request, env: Env, pathname: string): Promise<Res
       return withCleared(ok);
     }
     const primary = await getSetting(env.DB, "ig_user_id");
+    const me = await graph<{ username?: string; user_id: string }>("/me?fields=user_id,username", { headers: { Authorization: `Bearer ${token}` } });
+    if (!me.user_id) return withCleared(loginPage("Instagram could not confirm this account.", req));
+    const expectedHandle = me.username?.toLowerCase() === IG_HANDLE.toLowerCase();
+    if (!expectedHandle && !(env.REVIEW_PASSWORD && primary && primary !== userId)) {
+      return withCleared(loginPage(`This Magic Word is set up for @${IG_HANDLE}. Log in with that Instagram account.`, req));
+    }
     if (primary && primary !== userId) {
+      if (!env.REVIEW_PASSWORD) return withCleared(loginPage("This Instagram account does not match the owner.", req));
       // A second account (Meta's App Review tester) is shown in /admin but never replaces the live one.
       await setSetting(env.DB, "review_ig_token", token);
       return Response.redirect(`${url.origin}/admin`, 303);
     }
+    await setSetting(env.DB, "ig_account_id", me.user_id);
     await setSetting(env.DB, "ig_token", token);
     await setSetting(env.DB, "ig_token_at", String(Date.now()));
     await setSetting(env.DB, "ig_user_id", userId);

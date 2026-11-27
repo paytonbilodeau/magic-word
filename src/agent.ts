@@ -1,4 +1,6 @@
 // Owner-only structured reads shared by local and remote MCP clients. Keep credentials out of every response.
+import { socialRead } from './social-reads';
+import { youtubeRead } from './youtube';
 import { manualReply, windowLeft } from './dashboard';
 import { getLead } from './db';
 import { z } from 'zod';
@@ -150,6 +152,25 @@ export async function agentRead(env: Env, req: Request, view: string): Promise<R
     ).results;
   const ok = (value: unknown) => Response.json(value, { headers: { 'Cache-Control': 'no-store' } });
   switch (view) {
+    case 'instagram_live_media':
+    case 'instagram_live_comments':
+    case 'instagram_live_inbox': {
+      const token = await getSetting(env.DB, 'ig_token');
+      if (!token) return Response.json({ error: 'Connect the Instagram account to this host or enable its local Composio connection.' }, { status: 409 });
+      try {
+        const data = await socialRead(async (_channel, url) => {
+          const res = await fetch(url, { headers: { Authorization: 'Bearer ' + token }, redirect: 'error', signal: AbortSignal.timeout(10000) });
+          if (!res.ok) throw Error('Instagram returned HTTP ' + res.status);
+          return res.json();
+        }, view, limit, q.get('media') || undefined);
+        return ok(data);
+      } catch (error) {
+        return Response.json({ error: error instanceof Error ? error.message : 'Instagram is unavailable.' }, { status: 502 });
+      }
+    }
+    case 'youtube_videos':
+    case 'youtube_comments':
+      return youtubeRead(env, view, Math.min(limit, 50));
     case 'status':
       return ok({
         mode: env.HOST_MODE || 'worker',

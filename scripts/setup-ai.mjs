@@ -149,7 +149,7 @@ export function setup(argv) {
   }
   if (!count)
     console.log('Use this local MCP entry in your client:\n' + JSON.stringify(configEntry, null, 2));
-  else console.log('Open a new AI session and ask Magic Word for its status. The sample inbox is ready.');
+  else console.log('Open a new AI session and ask Magic Word for its status.');
 }
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
   try {
