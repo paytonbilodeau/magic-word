@@ -22,7 +22,7 @@
     "setup:ai": "node scripts/setup-ai.mjs"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^1.3.0",
+    "@anthropic-ai/sdk": "^1.13.0",
     "@modelcontextprotocol/sdk": "1.32.2",
     "esbuild": "0.28.2",
     "jose": "6.2.18",
